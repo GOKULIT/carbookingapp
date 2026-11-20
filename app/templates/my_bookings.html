@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block title %}My Bookings | Valam Cars{% endblock %}
+
+{% block content %}
+<section style="background: var(--valam-gradient); color: #ffffff; padding: 2.5rem 0;">
+  <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+      <h2 class="fw-bold mb-1 text-white">My Reservations</h2>
+      <p class="text-white-50 small mb-0">Track active bookings, route locations, and invoices</p>
+    </div>
+    <a href="/fleet" class="btn btn-outline-light rounded-pill px-4 btn-sm fw-semibold">Book Another Car</a>
+  </div>
+</section>
+
+<div class="container my-5">
+  <div id="my-bookings-container" class="row g-4">
+    <!-- Populated dynamically via JS -->
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    const container = document.getElementById('my-bookings-container');
+    const user = API.getUser();
+
+    if (!user) {
+      container.innerHTML = `
+        <div class="col-12 text-center py-5">
+          <i class="bi bi-lock-fill text-muted display-4"></i>
+          <h5 class="fw-bold mt-3">Please Sign In</h5>
+          <p class="text-muted small">Sign in to view your reservation history and passes.</p>
+          <button class="btn btn-valam-primary rounded-pill px-4" onclick="openAuthModal('login')">Sign In Now</button>
+        </div>
+      `;
+      return;
+    }
+
+    try {
+      const data = await API.request('/bookings/my-bookings');
+      if (!data || data.length === 0) {
+        container.innerHTML = `
+          <div class="col-12 text-center py-5">
+            <i class="bi bi-car-front text-muted display-4"></i>
+            <h5 class="fw-bold mt-3">No Active Bookings</h5>
+            <p class="text-muted small">You don't have any bookings right now.</p>
+            <a href="/fleet" class="btn btn-valam-primary rounded-pill px-4">Browse Fleet</a>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = data.map(b => `
+        <div class="col-md-6 col-lg-4">
+          <div class="card border border-light-subtle rounded-4 p-4 bg-white shadow-sm h-100 d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="badge rounded-pill bg-valam-light text-valam-blue fw-bold">ORDER #${b.id}</span>
+              <span class="badge rounded-pill ${b.payment_status === 'SUCCESS' ? 'bg-success' : 'bg-warning'} px-3 py-1">
+                ${b.payment_status}
+              </span>
+            </div>
+
+            <h5 class="fw-bold text-dark mb-1">${b.car ? b.car.name : 'Valam Vehicle'}</h5>
+            <small class="text-muted mb-3 d-block"><i class="bi bi-geo-alt-fill text-valam-blue me-1"></i>${b.pickup_location} &rarr; ${b.dropoff_location}</small>
+
+            <div class="bg-valam-light rounded-3 p-3 small mb-3">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="text-muted">Start:</span>
+                <b class="text-dark">${b.pickup_datetime}</b>
+              </div>
+              <div class="d-flex justify-content-between mb-1">
+                <span class="text-muted">Return:</span>
+                <b class="text-dark">${b.dropoff_datetime}</b>
+              </div>
+              <div class="d-flex justify-content-between border-top pt-1 mt-1">
+                <span class="text-muted">Duration:</span>
+                <b class="text-valam-blue">${b.total_hours} Hours</b>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
+              <span class="h5 fw-bold text-dark mb-0">₹${b.total_amount.toLocaleString()}</span>
+              <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="window.print()">
+                <i class="bi bi-printer me-1"></i> Receipt
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    } catch (err) {
+      container.innerHTML = `<div class="col-12 alert alert-danger">${err.message}</div>`;
+    }
+  });
+</script>
+{% endblock %}

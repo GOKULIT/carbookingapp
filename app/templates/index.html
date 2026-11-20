@@ -1,0 +1,883 @@
+{% extends 'base.html' %}
+{% block title %}Valam Cars | Self Driving Cars Coimbatore{% endblock %}
+
+{% block content %}
+<div class="page-viewport-wrapper">
+
+  <!-- ================= HERO SECTION ================= -->
+  <section class="hero-valam-section text-white position-relative">
+    <div class="container position-relative z-2">
+
+      <div class="row align-items-center py-3 py-sm-4 py-lg-5 g-3 g-lg-4">
+        <!-- Left: Catchy Heading & Checklist -->
+        <div class="col-lg-6 text-center text-lg-start">
+          <div class="d-inline-flex mb-2 mb-sm-3">
+            <span class="badge bg-white text-valam-blue rounded-pill px-3 py-2 fw-bold tiny-badge shadow-sm d-inline-flex align-items-center">
+              <i class="bi bi-geo-alt-fill text-danger me-1"></i> SELF-DRIVE HUBS ACROSS COIMBATORE
+            </span>
+          </div>
+          
+          <h1 class="hero-fluid-title fw-extrabold text-white lh-1 mb-2 mb-sm-3">
+            Rent the Perfect Car<br class="d-none d-sm-inline"> for Every Journey!
+          </h1>
+          
+          <p class="hero-fluid-desc text-white-50 mb-3 mb-sm-4 mx-auto mx-lg-0">
+            Explore Coimbatore, the Nilgiris, and Tamil Nadu in total comfort and style. Transparent hourly billing with zero hidden costs.
+          </p>
+
+          <!-- 4 Bullet Checkpoints (Fluid Grid for Mobile) -->
+          <div class="hero-checkpoints-grid mb-3 mb-sm-4">
+            <div class="checkpoint-item">
+              <span class="orange-check-icon flex-shrink-0"><i class="bi bi-check-lg"></i></span>
+              <span class="small fw-semibold text-white">Book with flexibility</span>
+            </div>
+            <div class="checkpoint-item">
+              <span class="orange-check-icon flex-shrink-0"><i class="bi bi-check-lg"></i></span>
+              <span class="small fw-semibold text-white">Price transparency</span>
+            </div>
+            <div class="checkpoint-item">
+              <span class="orange-check-icon flex-shrink-0"><i class="bi bi-check-lg"></i></span>
+              <span class="small fw-semibold text-white">Extend or return anytime</span>
+            </div>
+            <div class="checkpoint-item">
+              <span class="orange-check-icon flex-shrink-0"><i class="bi bi-check-lg"></i></span>
+              <span class="small fw-semibold text-white">Doorstep delivery in 2 hrs</span>
+            </div>
+          </div>
+
+          <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-2 pt-1">
+            <a href="#ready-cars" class="btn btn-pill-trans px-3 px-sm-4 py-2 fw-semibold">
+              Find a Car <i class="bi bi-arrow-down-short ms-1"></i>
+            </a>
+            <a href="/fleet" class="btn btn-pill-white px-3 px-sm-4 py-2 fw-bold">
+              Explore All Fleet &nearr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Right: Responsive Car Stage -->
+        <div class="col-lg-6 text-center position-relative mt-3 mt-lg-0">
+          <div class="hero-pin-beacon position-absolute">
+            <i class="bi bi-geo-alt-fill text-info fs-4 fs-sm-3"></i>
+          </div>
+          <div class="hero-car-stage">
+            <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=900&q=80" 
+                 alt="Toyota Avanza Valam" class="hero-car-fitted">
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= FLOATING QUICK-SEARCH BAR (Mobile-First Stacking) ================= -->
+  <div class="container floating-search-container px-3 px-sm-auto">
+    <div class="card border-0 shadow-lg floating-search-card bg-white p-2 p-md-3">
+      <div class="row g-2 align-items-center">
+        
+        <!-- Hub Selector -->
+        <div class="col-12 col-md-4 col-lg-3 d-flex align-items-center px-2 px-md-3 py-1">
+          <div class="valam-circle-icon me-2 flex-shrink-0">
+            <i class="bi bi-geo-alt-fill text-white"></i>
+          </div>
+          <div class="w-100 min-w-0">
+            <label class="d-block text-muted text-uppercase fw-bold tiny-label mb-0">City Hub</label>
+            <select id="quick-city-select" class="form-select border-0 p-0 fw-bold text-dark bg-transparent shadow-none small text-truncate">
+              <option value="RS Puram, Coimbatore.">RS Puram Hub, Coimbatore</option>
+              <option value="Coimbatore International Airport">Coimbatore Intl Airport (CJB)</option>
+              <option value="Gandhipuram Central Hub">Gandhipuram Central Hub</option>
+              <option value="Coimbatore Railway Station">Railway Station Junction</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-auto d-none d-lg-block vr my-auto" style="height: 38px;"></div>
+
+        <!-- Pickup Date & Hour -->
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex align-items-center px-2 px-md-3 py-1 border-top-mobile">
+          <div class="valam-circle-icon me-2 flex-shrink-0">
+            <i class="bi bi-calendar-event text-white"></i>
+          </div>
+          <div class="w-100 min-w-0">
+            <label class="d-block text-muted text-uppercase fw-bold tiny-label mb-0">Pickup Time</label>
+            <input type="datetime-local" id="quick-pickup-dt" class="form-control border-0 p-0 fw-bold text-dark bg-transparent shadow-none small">
+          </div>
+        </div>
+
+        <!-- Drop Date & Hour -->
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex align-items-center px-2 px-md-3 py-1 border-top-mobile">
+          <div class="valam-circle-icon me-2 flex-shrink-0">
+            <i class="bi bi-calendar-check text-white"></i>
+          </div>
+          <div class="w-100 min-w-0">
+            <label class="d-block text-muted text-uppercase fw-bold tiny-label mb-0">Return Time</label>
+            <input type="datetime-local" id="quick-dropoff-dt" class="form-control border-0 p-0 fw-bold text-dark bg-transparent shadow-none small">
+          </div>
+        </div>
+
+        <!-- Search CTA -->
+        <div class="col-12 col-lg-auto ms-lg-auto px-2 pt-2 pt-lg-0">
+          <button class="btn btn-valam-primary rounded-pill px-4 py-2 w-100 fw-bold d-flex align-items-center justify-content-center gap-2" onclick="applyQuickSearch()">
+            <i class="bi bi-search"></i> <span>Search Cars</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SECTION 2: PROMO TICKETS (Native Touch-Swipe) ================= -->
+  <section class="container my-3 my-md-4 pt-2">
+    <div class="tickets-scroll-wrapper">
+      <div class="tickets-flex-track">
+        <div class="ticket-card p-3 d-flex justify-content-between align-items-center bg-white shadow-sm flex-shrink-0">
+          <div class="pe-2">
+            <small class="text-valam-blue fw-bold d-block mb-1"><i class="bi bi-car-front-fill me-1"></i> Ride safe with Valam</small>
+            <p class="small fw-semibold text-dark mb-2">Valam Cars offers 10% off for new users in Coimbatore.</p>
+            <span class="badge rounded-pill bg-valam-blue py-1 px-2 fw-bold"><i class="bi bi-gear-wide-connected me-1"></i> 10% for all users*</span>
+          </div>
+          <div class="ps-2 ps-sm-3 border-start border-dashed text-center flex-shrink-0">
+            <span class="text-muted small d-block">Valam</span>
+            <button class="btn btn-light rounded-circle btn-sm shadow-none mt-2"><i class="bi bi-chevron-right"></i></button>
+          </div>
+        </div>
+
+        <div class="ticket-card p-3 d-flex justify-content-between align-items-center bg-white shadow-sm flex-shrink-0">
+          <div class="pe-2">
+            <small class="text-valam-blue fw-bold d-block mb-1"><i class="bi bi-compass-fill me-1"></i> Weekend Getaway</small>
+            <p class="small fw-semibold text-dark mb-2">Flat 15% discount for reservations over 24 hours.</p>
+            <span class="badge rounded-pill bg-valam-blue py-1 px-2 fw-bold"><i class="bi bi-patch-check me-1"></i> 15% Weekend*</span>
+          </div>
+          <div class="ps-2 ps-sm-3 border-start border-dashed text-center flex-shrink-0">
+            <span class="text-muted small d-block">Valam</span>
+            <button class="btn btn-light rounded-circle btn-sm shadow-none mt-2"><i class="bi bi-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 3: READY TO DRIVE CARS WITH LIVE FILTER ================= -->
+  <section id="ready-cars" class="container my-4 my-md-5">
+    
+    <!-- Title & Status Header -->
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-3">
+      <div>
+        <h3 class="fw-extrabold text-dark mb-0 fs-4 fs-sm-3">Ready to drive cars</h3>
+        <p class="text-muted small mb-0">Select any vehicle to calculate route distances &amp; customize rental hours</p>
+      </div>
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <span class="badge rounded-pill bg-valam-light text-valam-blue fw-bold px-3 py-2" id="home-filter-count">
+          {{ cars|length }} Cars Available
+        </span>
+        <a href="/fleet" class="text-decoration-none fw-bold text-valam-blue small d-none d-sm-inline">
+          View all <i class="bi bi-chevron-right"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Live Category Filter Chip Bar (Touch Swipe) -->
+    <div class="home-category-scroll mb-3 mb-md-4">
+      <div class="home-chips-track">
+        <button class="home-filter-chip active" onclick="filterHomeFleet('all', this)">
+          <i class="bi bi-grid-fill me-1"></i> All Fleet
+        </button>
+        <button class="home-filter-chip" onclick="filterHomeFleet('SUV', this)">
+          <i class="bi bi-car-front-fill me-1"></i> SUVs
+        </button>
+        <button class="home-filter-chip" onclick="filterHomeFleet('Hatchback', this)">
+          <i class="bi bi-car-front me-1"></i> Hatchbacks
+        </button>
+        <button class="home-filter-chip" onclick="filterHomeFleet('Sedan', this)">
+          <i class="bi bi-speedometer me-1"></i> Sedans
+        </button>
+        <button class="home-filter-chip" onclick="filterHomeFleet('MPV', this)">
+          <i class="bi bi-people-fill me-1"></i> MPVs
+        </button>
+      </div>
+    </div>
+
+    <!-- Responsive Adaptive Grid (320px up to 4K) -->
+    <div class="responsive-fleet-grid" id="home-car-grid">
+      {% for car in cars %}
+      {% set car_info = car.to_dict() %}
+      <div class="home-car-col" data-category="{{ car.category }}">
+        <div class="valam-car-card rounded-4 p-3 position-relative overflow-hidden h-100 d-flex flex-column">
+          
+          <!-- Top Badges Row -->
+          <div class="d-flex justify-content-between align-items-center position-relative z-2 mb-2 gap-1">
+            <span class="badge bg-white text-dark rounded-pill shadow-sm px-2 py-1 small fw-bold flex-shrink-0">
+              <i class="bi bi-star-fill text-warning me-1"></i>{{ car.rating }}
+            </span>
+            <span class="badge bg-white text-dark rounded-pill shadow-sm px-2 px-sm-3 py-1 small fw-semibold text-truncate max-w-avail">
+              {{ car_info.available_label }}
+            </span>
+            <button class="btn btn-white rounded-circle btn-sm shadow-sm d-flex align-items-center justify-content-center flex-shrink-0" style="width:32px; height:32px;" onclick="toggleBookmark(this, {{ car.id }})">
+              <i class="bi bi-bookmark text-dark"></i>
+            </button>
+          </div>
+
+          <!-- Ghosted Background Text (Clipped Safely) -->
+          <div class="valam-ghost-text user-select-none">{{ car.watermark_text or car.name.split()[0].upper() }}</div>
+
+          <!-- Car Image Stage (Mobile Clamped) -->
+          <div class="car-card-img-stage position-relative z-2">
+            <img src="{{ car.image_url }}" alt="{{ car.name }}" loading="lazy">
+          </div>
+
+          <!-- Bottom Details Capsule -->
+          <div class="bg-white rounded-4 p-3 position-relative z-2 mt-auto shadow-sm">
+            <div class="d-flex justify-content-between align-items-baseline gap-2 mb-1">
+              <h5 class="fw-bold text-dark mb-0 text-truncate">{{ car.name }}</h5>
+              <div class="text-end flex-shrink-0">
+                <span class="h5 fw-bold text-dark mb-0">&#8377;{{ car.price_per_day|int }}</span>
+                <small class="text-muted small">/day</small>
+              </div>
+            </div>
+
+            <p class="small text-muted mb-2 text-truncate">
+              <i class="bi bi-geo-alt-fill text-valam-blue me-1"></i>{{ car.location }} &bull; <b class="text-valam-blue">&#8377;{{ car.price_per_hour|int }}/hr</b>
+            </p>
+
+            <!-- Adaptive Specifications Grid (2x2 on small mobile, 4x1 on wider screens) -->
+            <div class="specs-inline-bar">
+              <div class="spec-micro-item"><i class="bi bi-gear-fill"></i><span>{{ car.transmission }}</span></div>
+              <div class="spec-micro-item"><i class="bi bi-people-fill"></i><span>{{ car.seating_capacity }} Seats</span></div>
+              <div class="spec-micro-item"><i class="bi bi-snow"></i><span>{% if car.has_ac %}AC{% else %}Non-AC{% endif %}</span></div>
+              <div class="spec-micro-item"><i class="bi bi-fuel-pump-fill"></i><span>{{ car.fuel_type }}</span></div>
+            </div>
+
+            <!-- Direct Flow Button to /car/<id> -->
+            <div class="mt-3">
+              {% if car_info.is_sold_out %}
+                <button class="btn btn-dark w-100 rounded-pill fw-bold py-2" disabled>Sold Out</button>
+              {% else %}
+                <a href="/car/{{ car.id }}" class="btn btn-valam-primary w-100 rounded-pill fw-bold py-2 text-center text-decoration-none d-flex align-items-center justify-content-center gap-1">
+                  <span>Book Now</span> <i class="bi bi-arrow-right"></i>
+                </a>
+              {% endif %}
+            </div>
+          </div>
+
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Empty state for homepage filter -->
+    <div id="home-empty-state" class="text-center py-5" style="display: none;">
+      <div class="stat-round-icon bg-valam-light text-valam-blue mx-auto mb-2"><i class="bi bi-car-front"></i></div>
+      <h5 class="fw-bold text-dark">No cars available in this category</h5>
+      <p class="text-muted small">Try selecting another vehicle type.</p>
+      <button class="btn btn-valam-primary rounded-pill btn-sm px-3" onclick="resetHomeFleet()">View All Fleet</button>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 4: REAL TIME STATS ================= -->
+  <section class="container my-4 my-md-5">
+    <h4 class="fw-bold text-dark mb-3 fs-5">Coimbatore Car Rental: Real Time Information</h4>
+    <div class="card border-0 shadow-sm rounded-4 p-3 p-md-4 bg-white">
+      <div class="row text-start g-3 align-items-center">
+        <div class="col-6 col-md-3 d-flex align-items-center gap-2 gap-md-3">
+          <div class="stat-round-icon bg-valam-light text-valam-blue flex-shrink-0"><i class="bi bi-cash-stack"></i></div>
+          <div class="min-w-0">
+            <h5 class="fw-bold text-dark mb-0 fs-6 fs-sm-5">&#8377;1500</h5>
+            <small class="text-muted tiny text-truncate d-block">Avg Daily Price</small>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 d-flex align-items-center gap-2 gap-md-3">
+          <div class="stat-round-icon bg-valam-light text-valam-blue flex-shrink-0"><i class="bi bi-car-front-fill"></i></div>
+          <div class="min-w-0">
+            <h5 class="fw-bold text-dark mb-0 fs-6 fs-sm-5">Swift</h5>
+            <small class="text-muted tiny text-truncate d-block">Most Popular</small>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 d-flex align-items-center gap-2 gap-md-3">
+          <div class="stat-round-icon bg-valam-light text-valam-blue flex-shrink-0"><i class="bi bi-coin"></i></div>
+          <div class="min-w-0">
+            <h5 class="fw-bold text-dark mb-0 fs-6 fs-sm-5">&#8377;120 <span class="tiny fw-normal text-muted">/hr</span></h5>
+            <small class="text-muted tiny text-truncate d-block">Cheapest Rate</small>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 d-flex align-items-center gap-2 gap-md-3">
+          <div class="stat-round-icon bg-valam-light text-valam-blue flex-shrink-0"><i class="bi bi-star-fill text-warning"></i></div>
+          <div class="min-w-0">
+            <h5 class="fw-bold text-dark mb-0 fs-6 fs-sm-5">4.5 <span class="text-warning tiny">&#9733;&#9733;&#9733;&#9733;&#9733;</span></h5>
+            <small class="text-muted tiny text-truncate d-block">Avg Rating</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 5: HOW IT WORKS ================= -->
+  <section id="about-valam" class="container my-4 my-md-5 py-2 py-md-4 border-top">
+    <div class="text-center mx-auto mb-4" style="max-width: 620px;">
+      <span class="badge bg-valam-light text-valam-blue rounded-pill px-3 py-1 fw-bold small mb-2">EASY 4-STEP PROCESS</span>
+      <h2 class="fw-bold text-dark fs-3 fs-sm-2">How Valam Self-Drive Works</h2>
+      <p class="text-muted small">Experience premium vehicles on your schedule with zero paperwork queues.</p>
+    </div>
+
+    <div class="row g-2 g-sm-3 text-center">
+      <div class="col-6 col-lg-3">
+        <div class="p-3 p-md-4 rounded-4 bg-valam-light h-100">
+          <div class="stat-round-icon bg-white text-valam-blue mx-auto mb-2 mb-sm-3 shadow-sm"><i class="bi bi-car-front-fill"></i></div>
+          <h6 class="fw-bold text-dark mb-1 fs-6">1. Pick Vehicle</h6>
+          <p class="tiny text-muted mb-0">Browse verified hatchbacks, SUVs, or sedans with transparent pricing.</p>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="p-3 p-md-4 rounded-4 bg-valam-light h-100">
+          <div class="stat-round-icon bg-white text-valam-blue mx-auto mb-2 mb-sm-3 shadow-sm"><i class="bi bi-map-fill"></i></div>
+          <h6 class="fw-bold text-dark mb-1 fs-6">2. Map Hubs</h6>
+          <p class="tiny text-muted mb-0">Select pickup and return hubs. Distance and hours auto-calculate.</p>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="p-3 p-md-4 rounded-4 bg-valam-light h-100">
+          <div class="stat-round-icon bg-white text-valam-blue mx-auto mb-2 mb-sm-3 shadow-sm"><i class="bi bi-credit-card-2-back-fill"></i></div>
+          <h6 class="fw-bold text-dark mb-1 fs-6">3. Instant Pay</h6>
+          <p class="tiny text-muted mb-0">Confirm and lock your timeframe securely with instant Razorpay confirmation.</p>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="p-3 p-md-4 rounded-4 bg-valam-light h-100">
+          <div class="stat-round-icon bg-white text-valam-blue mx-auto mb-2 mb-sm-3 shadow-sm"><i class="bi bi-key-fill"></i></div>
+          <h6 class="fw-bold text-dark mb-1 fs-6">4. Drive Away</h6>
+          <p class="tiny text-muted mb-0">Collect at your hub or receive doorstep delivery with a full tank.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 6: SAFETY & GUARANTEES ================= -->
+  <section class="container my-4 my-md-5">
+    <div class="card border-0 rounded-4 rounded-md-5 p-3 p-sm-4 p-md-5 bg-valam-light">
+      <div class="row align-items-center g-3 g-md-4">
+        <div class="col-lg-7 text-center text-lg-start">
+          <span class="badge bg-white text-valam-blue rounded-pill px-3 py-1 fw-bold small mb-2">THE VALAM PROMISE</span>
+          <h3 class="fw-extrabold text-dark mb-2 mb-sm-3 fs-4 fs-sm-3">Engineered for Safety, Trusted by 50,000+ Travellers</h3>
+          <p class="text-muted small mb-3 mb-sm-4">Every car undergoes a mandatory 35-point mechanical inspection before handover. Drive to the hills or through the city with total peace of mind.</p>
+          
+          <div class="row g-2 g-sm-3 text-start">
+            <div class="col-6 d-flex align-items-center gap-2">
+              <i class="bi bi-patch-check-fill text-valam-blue fs-5 flex-shrink-0"></i>
+              <span class="small fw-semibold text-dark">Zero Deposit</span>
+            </div>
+            <div class="col-6 d-flex align-items-center gap-2">
+              <i class="bi bi-clock-history text-valam-blue fs-5 flex-shrink-0"></i>
+              <span class="small fw-semibold text-dark">Flexible Return</span>
+            </div>
+            <div class="col-6 d-flex align-items-center gap-2">
+              <i class="bi bi-shield-shaded text-valam-blue fs-5 flex-shrink-0"></i>
+              <span class="small fw-semibold text-dark">Full Insurance</span>
+            </div>
+            <div class="col-6 d-flex align-items-center gap-2">
+              <i class="bi bi-telephone-fill text-valam-blue fs-5 flex-shrink-0"></i>
+              <span class="small fw-semibold text-dark">24x7 Support</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-5 text-center mt-3 mt-lg-0">
+          <img src="https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?auto=format&fit=crop&w=700&q=80" 
+               alt="Kia Sonet Valam" class="img-fluid rounded-4 shadow-sm" style="max-height: 220px; object-fit: contain;">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 7: VACATION TRIP DESTINATIONS ================= -->
+  <section class="container my-4 my-md-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold text-dark mb-0 fs-5">Where to next vacation trip?</h4>
+      <a href="#" class="text-decoration-none fw-bold text-valam-blue small">View all &gt;</a>
+    </div>
+
+    <div class="vacation-scroll-track">
+      <div class="vacation-spot-card flex-shrink-0">
+        <div class="position-relative h-100">
+          <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=400&q=80" alt="Gedee Car Museum" loading="lazy">
+          <span class="badge bg-white text-dark rounded-pill position-absolute top-0 start-0 m-2 tiny fw-bold shadow-sm">
+            <i class="bi bi-star-fill text-warning"></i> 4.5
+          </span>
+          <div class="p-2 bg-white">
+            <b class="d-block small text-dark text-truncate">Gedee Car Museum</b>
+            <small class="text-muted tiny text-truncate d-block"><i class="bi bi-geo-alt-fill text-valam-blue"></i> Race Course, CBE</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="vacation-spot-card flex-shrink-0">
+        <div class="position-relative h-100">
+          <img src="https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80" alt="Adiyogi" loading="lazy">
+          <span class="badge bg-white text-dark rounded-pill position-absolute top-0 start-0 m-2 tiny fw-bold shadow-sm">
+            <i class="bi bi-star-fill text-warning"></i> 4.5
+          </span>
+          <div class="p-2 bg-white">
+            <b class="d-block small text-dark text-truncate">Adiyogi Shiva</b>
+            <small class="text-muted tiny text-truncate d-block"><i class="bi bi-geo-alt-fill text-valam-blue"></i> Ishana Vihar, CBE</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="vacation-spot-card flex-shrink-0">
+        <div class="position-relative h-100">
+          <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=400&q=80" alt="Velliangiri Hills" loading="lazy">
+          <span class="badge bg-white text-dark rounded-pill position-absolute top-0 start-0 m-2 tiny fw-bold shadow-sm">
+            <i class="bi bi-star-fill text-warning"></i> 4.6
+          </span>
+          <div class="p-2 bg-white">
+            <b class="d-block small text-dark text-truncate">Velliangiri Hills</b>
+            <small class="text-muted tiny text-truncate d-block"><i class="bi bi-geo-alt-fill text-valam-blue"></i> Western Ghats, CBE</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="vacation-spot-card flex-shrink-0">
+        <div class="position-relative h-100">
+          <img src="https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=400&q=80" alt="Marudhamalai Temple" loading="lazy">
+          <span class="badge bg-white text-dark rounded-pill position-absolute top-0 start-0 m-2 tiny fw-bold shadow-sm">
+            <i class="bi bi-star-fill text-warning"></i> 4.7
+          </span>
+          <div class="p-2 bg-white">
+            <b class="d-block small text-dark text-truncate">Marudhamalai Temple</b>
+            <small class="text-muted tiny text-truncate d-block"><i class="bi bi-geo-alt-fill text-valam-blue"></i> Hill Temple, CBE</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 8: FAQS ACCORDION ================= -->
+  <section id="faqs" class="container my-4 my-md-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold text-dark mb-0 fs-5">FAQs</h4>
+      <a href="#" class="text-decoration-none fw-bold text-valam-blue small">View all &gt;</a>
+    </div>
+
+    <div class="accordion border-0" id="valamHomeFaq">
+      <div class="accordion-item border-0 mb-2 rounded-3 bg-valam-light overflow-hidden">
+        <h2 class="accordion-header">
+          <button class="accordion-button bg-valam-light shadow-none fw-bold text-dark small py-3" type="button" data-bs-toggle="collapse" data-bs-target="#hFaqOne" aria-expanded="true">
+            Is there a speed limit?
+          </button>
+        </h2>
+        <div id="hFaqOne" class="accordion-collapse collapse show" data-bs-parent="#valamHomeFaq">
+          <div class="accordion-body small text-muted pt-0">
+            Valam allows up to 125 km/hr on highways. Some vehicles feature speed governor limits (80 km/hr) as per government directives.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item border-0 mb-2 rounded-3 bg-valam-light overflow-hidden">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed bg-valam-light shadow-none fw-bold text-dark small py-3" type="button" data-bs-toggle="collapse" data-bs-target="#hFaqTwo">
+            Can I customize rental hours manually?
+          </button>
+        </h2>
+        <div id="hFaqTwo" class="accordion-collapse collapse" data-bs-parent="#valamHomeFaq">
+          <div class="accordion-body small text-muted pt-0">
+            Yes! Clicking Book Now opens the detail view where you can use the interactive + / - counter to pick anywhere from 1 hour to several days with live rate calculations.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item border-0 mb-2 rounded-3 bg-valam-light overflow-hidden">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed bg-valam-light shadow-none fw-bold text-dark small py-3" type="button" data-bs-toggle="collapse" data-bs-target="#hFaqThree">
+            What documents are required?
+          </button>
+        </h2>
+        <div id="hFaqThree" class="accordion-collapse collapse" data-bs-parent="#valamHomeFaq">
+          <div class="accordion-body small text-muted pt-0">
+            Your original Indian Driving License and Aadhar Card / Passport. Verified digitally during booking.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="valam-footer-blue py-4 py-sm-5 text-white mt-4 mt-sm-5">
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 text-center text-md-start">
+      <a href="/" class="valam-brand-badge text-decoration-none text-white d-inline-flex flex-column align-items-center">
+        <span class="brand-valam-text">Valam</span>
+        <span class="brand-sub-text">Self Driving Cars</span>
+      </a>
+
+      <div class="d-flex flex-wrap justify-content-center gap-3 small fw-semibold">
+        <a href="/" class="text-white text-decoration-none">Home</a>
+        <a href="/fleet" class="text-white text-decoration-none">Fleet</a>
+        <a href="#about-valam" class="text-white text-decoration-none">About</a>
+        <a href="#faqs" class="text-white text-decoration-none">FAQs</a>
+      </div>
+
+      <div class="social-links-pill px-3 py-1 rounded-pill d-flex gap-3 align-items-center">
+        <a href="#" class="text-white" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+        <a href="#" class="text-white" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+        <a href="#" class="text-white" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+        <a href="#" class="text-white" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+      </div>
+    </div>
+  </footer>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Live Homepage Category Filter
+  function filterHomeFleet(category, btn) {
+    document.querySelectorAll('.home-filter-chip').forEach(c => c.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+
+    const cols = document.querySelectorAll('.home-car-col');
+    let visibleCount = 0;
+
+    cols.forEach(col => {
+      const cat = col.getAttribute('data-category') || '';
+      if (category.toLowerCase() === 'all' || cat.toLowerCase() === category.toLowerCase()) {
+        col.style.display = 'block';
+        visibleCount++;
+      } else {
+        col.style.display = 'none';
+      }
+    });
+
+    const countBadge = document.getElementById('home-filter-count');
+    if (countBadge) {
+      countBadge.innerText = `${visibleCount} Car${visibleCount === 1 ? '' : 's'} Available`;
+    }
+
+    const emptyBox = document.getElementById('home-empty-state');
+    const grid = document.getElementById('home-car-grid');
+    if (visibleCount === 0) {
+      emptyBox.style.display = 'block';
+      grid.style.display = 'none';
+    } else {
+      emptyBox.style.display = 'none';
+      grid.style.display = 'grid';
+    }
+  }
+
+  function resetHomeFleet() {
+    const firstChip = document.querySelector('.home-filter-chip');
+    if (firstChip) filterHomeFleet('all', firstChip);
+  }
+
+  // Quick Search Bar Handler
+  function applyQuickSearch() {
+    const city = document.getElementById('quick-city-select').value;
+    const start = document.getElementById('quick-pickup-dt').value;
+    const end = document.getElementById('quick-dropoff-dt').value;
+
+    document.getElementById('ready-cars').scrollIntoView({ behavior: 'smooth' });
+    if (typeof showToast === 'function') {
+      showToast(`Showing fleet ready near ${city.split(',')[0]}`, 'info');
+    }
+  }
+
+  // Pre-fill search inputs
+  document.addEventListener('DOMContentLoaded', () => {
+    const sInput = document.getElementById('quick-pickup-dt');
+    const eInput = document.getElementById('quick-dropoff-dt');
+
+    if (sInput && eInput) {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      const s = new Date(now.getTime() + 1 * 3600 * 1000);
+      const e = new Date(now.getTime() + 5 * 3600 * 1000);
+      sInput.value = s.toISOString().slice(0, 16);
+      eInput.value = e.toISOString().slice(0, 16);
+    }
+  });
+
+  // Bookmark toggle
+  function toggleBookmark(btn, carId) {
+    const icon = btn.querySelector('i');
+    let saved = JSON.parse(localStorage.getItem('valam_favorites') || '[]');
+
+    if (icon.classList.contains('bi-bookmark-fill')) {
+      icon.classList.replace('bi-bookmark-fill', 'bi-bookmark');
+      icon.classList.remove('text-valam-blue');
+      saved = saved.filter(id => id !== carId);
+    } else {
+      icon.classList.replace('bi-bookmark', 'bi-bookmark-fill');
+      icon.classList.add('text-valam-blue');
+      if (!saved.includes(carId)) saved.push(carId);
+      if (typeof showToast === 'function') {
+        showToast('Saved to your favorites', 'success');
+      }
+    }
+    localStorage.setItem('valam_favorites', JSON.stringify(saved));
+  }
+</script>
+
+<style>
+  /* ================= ZERO OVERFLOW SHELL ================= */
+  .page-viewport-wrapper {
+    width: 100%;
+    overflow-x: clip; /* Cleanly traps horizontal overscroll without layout breaking */
+  }
+
+  /* ================= HERO SECTION ================= */
+  .hero-valam-section {
+    background: var(--valam-gradient);
+    padding-bottom: clamp(2rem, 6vw, 4.5rem);
+  }
+  .tiny-badge {
+    font-size: clamp(0.68rem, 2vw, 0.78rem);
+  }
+  .hero-fluid-title {
+    font-size: clamp(1.75rem, 6vw, 3.4rem);
+    letter-spacing: -0.5px;
+  }
+  .hero-fluid-desc {
+    font-size: clamp(0.85rem, 2.2vw, 1.05rem);
+    max-width: 520px;
+    line-height: 1.55;
+  }
+  .hero-checkpoints-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem 1rem;
+  }
+  @media (max-width: 440px) {
+    .hero-checkpoints-grid {
+      grid-template-columns: 1fr;
+      text-align: left;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+  }
+  .checkpoint-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .hero-car-stage {
+    width: 100%;
+    height: clamp(160px, 35vw, 300px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hero-car-fitted {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 15px 20px rgba(0, 0, 0, 0.35));
+  }
+  .hero-pin-beacon {
+    top: 10%;
+    left: 25%;
+    filter: drop-shadow(0 0 10px #38bdf8);
+  }
+
+  /* ================= FLOATING SEARCH CAPSULE ================= */
+  .floating-search-container {
+    margin-top: -2.4rem;
+    position: relative;
+    z-index: 50;
+  }
+  .floating-search-card {
+    border-radius: var(--radius-pill);
+  }
+  .tiny-label {
+    font-size: 0.68rem;
+  }
+  @media (max-width: 991.98px) {
+    .floating-search-container {
+      margin-top: 1rem;
+    }
+    .floating-search-card {
+      border-radius: 20px !important;
+    }
+    .border-top-mobile {
+      border-top: 1px solid #f1f5f9;
+      padding-top: 0.5rem !important;
+    }
+  }
+
+  /* ================= TOUCH-SWIPE CHIP FILTER ================= */
+  .home-category-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+    scroll-snap-type: x mandatory;
+  }
+  .home-category-scroll::-webkit-scrollbar {
+    display: none;
+  }
+  .home-chips-track {
+    display: inline-flex;
+    gap: 0.5rem;
+    min-width: max-content;
+    padding: 2px 2px;
+  }
+  .home-filter-chip {
+    background: #ffffff;
+    border: 1.5px solid var(--border-subtle);
+    border-radius: var(--radius-pill);
+    padding: 0.45rem 1.15rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+    scroll-snap-align: start;
+    transition: all 0.2s ease;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .home-filter-chip:hover {
+    border-color: var(--valam-blue);
+    color: var(--valam-blue);
+  }
+  .home-filter-chip.active {
+    background-color: var(--valam-blue);
+    border-color: var(--valam-blue);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(15, 75, 180, 0.22);
+  }
+
+  /* ================= ADAPTIVE RESPONSIVE GRID ================= */
+  .responsive-fleet-grid {
+    display: grid;
+    /* Scales from 280px phones up to 4K monitors */
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    gap: clamp(1rem, 2.5vw, 1.8rem);
+  }
+  .valam-car-card {
+    background-color: var(--valam-light);
+    border: 1px solid rgba(15, 75, 180, 0.08);
+  }
+  .max-w-avail {
+    max-width: calc(100% - 90px);
+  }
+  .valam-ghost-text {
+    position: absolute;
+    top: 18%;
+    left: 0.5rem;
+    right: 0.5rem;
+    font-size: clamp(2.8rem, 8vw, 4.2rem);
+    font-weight: 900;
+    color: rgba(15, 75, 180, 0.08);
+    letter-spacing: 2px;
+    line-height: 1;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .car-card-img-stage {
+    height: clamp(140px, 28vw, 175px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0.5rem 0;
+  }
+  .car-card-img-stage img {
+    max-width: 95%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.15));
+  }
+
+  /* Micro Specs Bar: 2x2 on mobile, 4x1 on desktop */
+  .specs-inline-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 0.65rem;
+  }
+  @media (max-width: 400px) {
+    .specs-inline-bar {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+  }
+  .spec-micro-item {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 0.35rem 0.2rem;
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+  .spec-micro-item i {
+    color: var(--valam-blue);
+    font-size: 0.85rem;
+  }
+
+  /* ================= TICKETS & VACATION SWIPE TRACKS ================= */
+  .tickets-scroll-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+  }
+  .tickets-scroll-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+  .tickets-flex-track {
+    display: flex;
+    gap: 0.75rem;
+    min-width: max-content;
+    padding-bottom: 4px;
+  }
+  .ticket-card {
+    width: clamp(260px, 75vw, 340px);
+    border: 1.5px dashed #cbd5e1;
+    border-radius: 12px;
+    scroll-snap-align: start;
+  }
+
+  .vacation-scroll-track {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 4px;
+  }
+  .vacation-scroll-track::-webkit-scrollbar {
+    display: none;
+  }
+  .vacation-spot-card {
+    width: clamp(150px, 42vw, 220px);
+    border-radius: 14px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    scroll-snap-align: start;
+  }
+  .vacation-spot-card img {
+    width: 100%;
+    height: 110px;
+    object-fit: cover;
+  }
+
+  /* ================= STATS ICONS ================= */
+  .stat-round-icon {
+    width: clamp(38px, 10vw, 48px);
+    height: clamp(38px, 10vw, 48px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.1rem, 3vw, 1.35rem);
+  }
+</style>
+{% endblock %}

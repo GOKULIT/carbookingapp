@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Valam Cars | Control Console</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body style="background:#f1f5f9;">
+
+  <nav style="background:var(--blue-primary); padding:1rem 0; color:#fff;">
+    <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+      <span class="valam-logo"><span class="logo-txt">Valam</span></span>
+      <div style="display:flex; gap:1rem;">
+        <a href="/" class="btn-pill-trans" style="font-size:0.85rem;">View Public Site</a>
+        <button onclick="API.clearAuth(); window.location.href='/';" class="btn-pill-white" style="font-size:0.85rem;">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container" style="padding:3rem 0 5rem;">
+    <!-- KPI Metrics -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1.5rem; margin-bottom:3rem;">
+      <div style="background:#fff; padding:1.5rem; border-radius:16px;">
+        <small style="color:var(--text-muted);">Total Revenue</small>
+        <h2 id="adm-rev" style="color:var(--blue-primary); font-size:2rem; font-weight:800;">₹0</h2>
+      </div>
+      <div style="background:#fff; padding:1.5rem; border-radius:16px;">
+        <small style="color:var(--text-muted);">Confirmed Bookings</small>
+        <h2 id="adm-bk" style="font-size:2rem; font-weight:800;">0</h2>
+      </div>
+      <div style="background:#fff; padding:1.5rem; border-radius:16px;">
+        <small style="color:var(--text-muted);">Fleet Count</small>
+        <h2 id="adm-cars" style="font-size:2rem; font-weight:800;">0</h2>
+      </div>
+      <div style="background:#fff; padding:1.5rem; border-radius:16px;">
+        <small style="color:var(--text-muted);">Registered Clients</small>
+        <h2 id="adm-users" style="font-size:2rem; font-weight:800;">0</h2>
+      </div>
+    </div>
+
+    <!-- Add Car Form -->
+    <div style="background:#fff; border-radius:16px; padding:2rem; margin-bottom:3rem;">
+      <h2 style="font-size:1.3rem; font-weight:800; margin-bottom:1.5rem;">Add Car to Inventory</h2>
+      <form id="admin-add-car-form" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1rem;">
+        <div>
+          <label style="font-size:0.8rem; font-weight:700;">Car Model Name</label>
+          <input type="text" name="name" required class="form-ctrl" placeholder="e.g. Hyundai Creta">
+        </div>
+        <div>
+          <label style="font-size:0.8rem; font-weight:700;">Brand / Make</label>
+          <input type="text" name="brand" required class="form-ctrl" placeholder="Hyundai">
+        </div>
+        <div>
+          <label style="font-size:0.8rem; font-weight:700;">Category</label>
+          <select name="category" class="form-ctrl">
+            <option value="SUV">SUV</option>
+            <option value="Hatchback">Hatchback</option>
+            <option value="Sedan">Sedan</option>
+            <option value="MPV">MPV</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:0.8rem; font-weight:700;">Hourly Rate (₹)</label>
+          <input type="number" step="0.01" name="price_per_hour" required class="form-ctrl" placeholder="140">
+        </div>
+        <div>
+          <label style="font-size:0.8rem; font-weight:700;">Image Upload</label>
+          <input type="file" name="image" class="form-ctrl" accept="image/*">
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="font-size:0.8rem; font-weight:700;">Or Web Image URL</label>
+          <input type="url" name="image_url" class="form-ctrl" placeholder="https://images.unsplash.com/...">
+        </div>
+        <div style="grid-column:1/-1;">
+          <button type="submit" class="btn-action-book" style="width:auto; padding:0.75rem 2rem;">Save to Inventory</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Bookings Ledger -->
+    <h2 style="font-size:1.3rem; font-weight:800; margin-bottom:1rem;">Master Bookings Ledger</h2>
+    <div style="overflow-x:auto; background:#fff; border-radius:16px;">
+      <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.9rem;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border-subtle); color:var(--text-muted); background:#f8fafc;">
+            <th style="padding:1rem;">ID</th>
+            <th style="padding:1rem;">Customer</th>
+            <th style="padding:1rem;">Vehicle</th>
+            <th style="padding:1rem;">Pickup Location</th>
+            <th style="padding:1rem;">Schedule</th>
+            <th style="padding:1rem;">Bill</th>
+            <th style="padding:1rem;">Status</th>
+          </tr>
+        </thead>
+        <tbody id="adm-bookings-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="/static/js/api.js"></script>
+  <script>
+    async function initAdmin() {
+      const u = API.getUser();
+      if (!u || u.role !== 'admin') {
+        alert("Restricted area. Please sign in as an Admin.");
+        window.location.href = '/';
+        return;
+      }
+
+      const stats = await API.request('/admin/stats');
+      document.getElementById('adm-rev').innerText = `₹${stats.total_revenue.toLocaleString()}`;
+      document.getElementById('adm-bk').innerText = stats.total_bookings;
+      document.getElementById('adm-cars').innerText = stats.total_cars;
+      document.getElementById('adm-users').innerText = stats.total_users;
+
+      const bookings = await API.request('/admin/bookings');
+      document.getElementById('adm-bookings-table').innerHTML = bookings.map(b => `
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:1rem;">#${b.id}</td>
+          <td style="padding:1rem;">${b.user ? b.user.full_name : 'N/A'}<br><small style="color:var(--text-muted)">${b.user ? b.user.phone : ''}</small></td>
+          <td style="padding:1rem;">${b.car ? b.car.name : 'N/A'}</td>
+          <td style="padding:1rem;">${b.pickup_location}</td>
+          <td style="padding:1rem;">${b.pickup_datetime} to ${b.dropoff_datetime} (${b.total_hours} hrs)</td>
+          <td style="padding:1rem;"><b>₹${b.total_amount}</b></td>
+          <td style="padding:1rem;"><span style="color:${b.payment_status === 'SUCCESS' ? '#10b981' : '#f59e0b'}; font-weight:700;">${b.payment_status}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    document.getElementById('admin-add-car-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        await API.request('/admin/cars', {
+          method: 'POST',
+          body: new FormData(e.target)
+        });
+        alert('Car added successfully!');
+        e.target.reset();
+        initAdmin();
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', initAdmin);
+  </script>
+</body>
+</html>

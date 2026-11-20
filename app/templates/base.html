@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f4bb4">
+  <meta name="description" content="Valam Cars - Self Driving Cars in Coimbatore, Tamil Nadu.">
+
+  <title>{% block title %}Valam Cars | Self Driving Cars Coimbatore{% endblock %}</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5.3.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <!-- Custom Figma Theme Stylesheet -->
+  <link rel="stylesheet" href="/static/css/style.css">
+
+  <!-- Razorpay Standard Checkout SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-white d-flex flex-column min-vh-100">
+
+  <!-- ================= GLOBAL TOAST CONTAINER ================= -->
+  <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 3100;">
+    <div id="valamToast" class="toast align-items-center text-white border-0 shadow-lg rounded-4" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body d-flex align-items-center gap-2 py-3 px-3">
+          <i id="toast-icon" class="bi bi-info-circle-fill fs-5"></i>
+          <span id="toast-msg" class="fw-semibold small">Notification message</span>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-3 m-auto shadow-none" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= GLOBAL RESPONSIVE NAVBAR ================= -->
+  <nav class="navbar navbar-expand-lg navbar-dark valam-global-nav sticky-top py-2 py-lg-3">
+    <div class="container d-flex align-items-center justify-content-between">
+      
+      <!-- Brand Logo Badge -->
+      <a href="/" class="valam-brand-badge text-decoration-none text-white d-inline-flex flex-column align-items-center flex-shrink-0">
+        <span class="brand-valam-text">Valam</span>
+        <span class="brand-sub-text">Self Driving Cars</span>
+      </a>
+
+      <!-- Mobile Hamburger Button with Explicit Event Fallback -->
+      <button class="navbar-toggler border-0 p-2 shadow-none rounded-3 d-lg-none" 
+              type="button" 
+              data-bs-toggle="offcanvas" 
+              data-bs-target="#mobileNavDrawer" 
+              aria-controls="mobileNavDrawer" 
+              aria-label="Toggle navigation"
+              onclick="toggleMobileNav()">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Desktop Nav Links -->
+      <div class="collapse navbar-collapse d-none d-lg-flex justify-content-between ms-4">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-3">
+          <li class="nav-item">
+            <a class="nav-link text-white-50 fw-semibold hover-white {% if request.path == '/' %}active text-white fw-bold{% endif %}" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white-50 fw-semibold hover-white {% if request.path == '/fleet' %}active text-white fw-bold{% endif %}" href="/fleet">Our Fleet</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white-50 fw-semibold hover-white" href="/#about-valam">About Us</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white-50 fw-semibold hover-white" href="/#faqs">FAQs</a>
+          </li>
+        </ul>
+
+        <!-- Desktop Auth Action Slot (Populated via auth.js) -->
+        <div id="nav-auth-slot" class="d-flex align-items-center gap-2">
+          <button type="button" class="btn btn-pill-trans" onclick="openAuthModal('login')">
+            Sign In
+          </button>
+          <button type="button" class="btn btn-pill-white" onclick="openAuthModal('register')">
+            Sign In &nearr;
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- ================= MOBILE OFFCANVAS DRAWER ================= -->
+  <div class="offcanvas offcanvas-start text-white border-0" 
+       tabindex="-1" 
+       id="mobileNavDrawer" 
+       aria-labelledby="mobileNavDrawerLabel">
+       
+    <div class="offcanvas-header border-bottom border-white-10 py-3 px-3">
+      <div class="valam-brand-badge text-white d-inline-flex flex-column align-items-center">
+        <span class="brand-valam-text fs-4">Valam</span>
+        <span class="brand-sub-text" style="font-size: 0.5rem;">Self Driving Cars</span>
+      </div>
+      <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    
+    <div class="offcanvas-body d-flex flex-column justify-content-between p-3 p-sm-4">
+      <!-- Nav Links -->
+      <ul class="nav flex-column gap-2 fs-6">
+        <li class="nav-item">
+          <a href="/" class="nav-link text-white d-flex align-items-center gap-3 py-2 px-2 rounded-3 hover-white-10 fw-semibold" onclick="closeMobileNav()">
+            <i class="bi bi-house-door-fill text-white-50 fs-5"></i> Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/fleet" class="nav-link text-white d-flex align-items-center gap-3 py-2 px-2 rounded-3 hover-white-10 fw-semibold" onclick="closeMobileNav()">
+            <i class="bi bi-grid-fill text-white-50 fs-5"></i> Our Fleet
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/my-bookings" class="nav-link text-white d-flex align-items-center gap-3 py-2 px-2 rounded-3 hover-white-10 fw-semibold" onclick="closeMobileNav()">
+            <i class="bi bi-calendar2-check-fill text-white-50 fs-5"></i> My Bookings
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/#about-valam" class="nav-link text-white d-flex align-items-center gap-3 py-2 px-2 rounded-3 hover-white-10 fw-semibold" onclick="closeMobileNav()">
+            <i class="bi bi-info-circle-fill text-white-50 fs-5"></i> How It Works
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/#faqs" class="nav-link text-white d-flex align-items-center gap-3 py-2 px-2 rounded-3 hover-white-10 fw-semibold" onclick="closeMobileNav()">
+            <i class="bi bi-question-circle-fill text-white-50 fs-5"></i> FAQs
+          </a>
+        </li>
+      </ul>
+
+      <!-- Bottom Drawer: Dynamic Auth Area & Contact -->
+      <div class="pt-3 border-top border-white-10">
+        <div id="drawer-auth-slot" class="mb-3">
+          <button type="button" class="btn btn-light text-valam-blue w-100 rounded-pill py-2 fw-bold mb-2 shadow-sm" onclick="openAuthModal('login')">
+            Sign In
+          </button>
+          <button type="button" class="btn btn-outline-light w-100 rounded-pill py-2 fw-bold" onclick="openAuthModal('register')">
+            Create Account
+          </button>
+        </div>
+
+        <div class="small text-white-50 d-flex flex-column gap-1">
+          <div><i class="bi bi-telephone-fill me-2 text-white"></i> +91 98400 12345</div>
+          <div><i class="bi bi-geo-alt-fill me-2 text-white"></i> RS Puram &bull; Airport Hub, Coimbatore</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PRIMARY PAGE CONTENT ================= -->
+  <div class="flex-grow-1">
+    {% block content %}{% endblock %}
+  </div>
+
+  <!-- ================= UNIFIED AUTH MODAL ================= -->
+  <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 430px;">
+      <div class="modal-content border-0 shadow-lg rounded-4 p-3 p-sm-4 bg-white">
+        
+        <div class="modal-header border-0 pb-0 position-relative">
+          <div class="w-100 text-center">
+            <div class="valam-brand-badge text-valam-blue border-primary d-inline-flex flex-column align-items-center mb-2" style="border-width: 1.5px;">
+              <span class="brand-valam-text fs-5 text-valam-blue">Valam</span>
+            </div>
+            <h4 class="fw-extrabold mb-1 text-dark" id="authModalLabel">Sign In</h4>
+            <p class="text-muted small mb-0" id="authModalSubtitle">Sign in to book and manage self-drive vehicles</p>
+          </div>
+          <button type="button" class="btn-close position-absolute top-0 end-0 m-3 shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body pt-3">
+          
+          <!-- Segmented Tab Switcher -->
+          <div class="auth-segmented-control mb-4">
+            <button type="button" class="auth-segment-btn active" id="tab-login-btn" onclick="switchAuthTab('login')">
+              Sign In
+            </button>
+            <button type="button" class="auth-segment-btn" id="tab-register-btn" onclick="switchAuthTab('register')">
+              New Account
+            </button>
+          </div>
+
+          <!-- Alert Box for Auth Errors -->
+          <div id="auth-error-alert" class="alert alert-danger py-2 px-3 small rounded-3 d-none mb-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> <span id="auth-error-msg">Error</span>
+          </div>
+
+          <!-- Form -->
+          <form id="auth-form" novalidate>
+            <!-- Registration fields -->
+            <div id="register-fields-group" style="display: none;">
+              <div class="mb-3">
+                <label class="form-label small fw-bold text-muted mb-1">FULL NAME</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-valam-light border-0 text-muted"><i class="bi bi-person-fill"></i></span>
+                  <input type="text" id="auth-fullname" class="form-control bg-valam-light border-0 py-2 small" placeholder="e.g. Suresh Kumar">
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-bold text-muted mb-1">PHONE NUMBER</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-valam-light border-0 text-muted small">+91</span>
+                  <input type="tel" id="auth-phone" class="form-control bg-valam-light border-0 py-2 small" placeholder="98400 12345">
+                </div>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-muted mb-1">EMAIL ADDRESS</label>
+              <div class="input-group">
+                <span class="input-group-text bg-valam-light border-0 text-muted"><i class="bi bi-envelope-fill"></i></span>
+                <input type="email" id="auth-email" required class="form-control bg-valam-light border-0 py-2 small" placeholder="name@domain.com">
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-4">
+              <label class="form-label small fw-bold text-muted mb-1">PASSWORD</label>
+              <div class="input-group">
+                <span class="input-group-text bg-valam-light border-0 text-muted"><i class="bi bi-lock-fill"></i></span>
+                <input type="password" id="auth-password" required class="form-control bg-valam-light border-0 py-2 small" placeholder="••••••••">
+                <button type="button" class="btn bg-valam-light border-0 text-muted px-3" onclick="togglePasswordVisibility('auth-password', this)">
+                  <i class="bi bi-eye-slash"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" id="auth-submit-btn" class="btn btn-valam-primary w-100 py-3 rounded-pill fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
+              <span id="auth-btn-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+              <span id="auth-btn-text">Sign In</span>
+            </button>
+          </form>
+
+          <p class="text-center text-muted tiny mt-3 mb-0">
+            By continuing, you agree to Valam's <a href="#" class="text-muted text-decoration-underline">Terms of Service</a> &bull; <a href="#" class="text-muted text-decoration-underline">Privacy Policy</a>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5.3.3 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Application Logic Scripts -->
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/auth.js"></script>
+  <script src="/static/js/main.js"></script>
+
+  <!-- Core Nav & Modal Controllers -->
+  <script>
+    // Fail-Safe Mobile Drawer Toggler
+    function toggleMobileNav() {
+      const drawerEl = document.getElementById('mobileNavDrawer');
+      if (drawerEl) {
+        const drawerInstance = bootstrap.Offcanvas.getOrCreateInstance(drawerEl);
+        drawerInstance.toggle();
+      }
+    }
+
+    function closeMobileNav() {
+      const drawerEl = document.getElementById('mobileNavDrawer');
+      if (drawerEl) {
+        const drawerInstance = bootstrap.Offcanvas.getInstance(drawerEl);
+        if (drawerInstance) drawerInstance.hide();
+      }
+    }
+
+    // Universal Toast
+    function showToast(message, type = 'info') {
+      const toastEl = document.getElementById('valamToast');
+      const toastMsg = document.getElementById('toast-msg');
+      const toastIcon = document.getElementById('toast-icon');
+
+      toastMsg.innerText = message;
+      toastEl.classList.remove('bg-danger', 'bg-success', 'bg-valam-blue', 'bg-warning');
+
+      if (type === 'success') {
+        toastEl.classList.add('bg-success');
+        toastIcon.className = 'bi bi-check-circle-fill fs-5';
+      } else if (type === 'error') {
+        toastEl.classList.add('bg-danger');
+        toastIcon.className = 'bi bi-exclamation-triangle-fill fs-5';
+      } else if (type === 'warning') {
+        toastEl.classList.add('bg-warning', 'text-dark');
+        toastIcon.className = 'bi bi-exclamation-circle-fill fs-5 text-dark';
+      } else {
+        toastEl.classList.add('bg-valam-blue');
+        toastIcon.className = 'bi bi-info-circle-fill fs-5';
+      }
+
+      const toast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 4000 });
+      toast.show();
+    }
+
+    // Toggle Password Visibility
+    function togglePasswordVisibility(fieldId, btn) {
+      const field = document.getElementById(fieldId);
+      const icon = btn.querySelector('i');
+      if (field.type === 'password') {
+        field.type = 'text';
+        icon.classList.replace('bi-eye-slash', 'bi-eye');
+      } else {
+        field.type = 'password';
+        icon.classList.replace('bi-eye', 'bi-eye-slash');
+      }
+    }
+
+    // Switch between Sign In / Sign Up tabs
+    function switchAuthTab(mode) {
+      const tabLogin = document.getElementById('tab-login-btn');
+      const tabReg = document.getElementById('tab-register-btn');
+      const regFields = document.getElementById('register-fields-group');
+      const btnText = document.getElementById('auth-btn-text');
+      const modalLabel = document.getElementById('authModalLabel');
+      const modalSubtitle = document.getElementById('authModalSubtitle');
+      const errBox = document.getElementById('auth-error-alert');
+
+      if (errBox) errBox.classList.add('d-none');
+
+      if (mode === 'login') {
+        if (tabLogin) tabLogin.classList.add('active');
+        if (tabReg) tabReg.classList.remove('active');
+        if (regFields) regFields.style.display = 'none';
+        if (btnText) btnText.innerText = 'Sign In';
+        if (modalLabel) modalLabel.innerText = 'Sign In';
+        if (modalSubtitle) modalSubtitle.innerText = 'Sign in to book and manage self-drive vehicles';
+        if (typeof currentAuthMode !== 'undefined') currentAuthMode = 'login';
+      } else {
+        if (tabReg) tabReg.classList.add('active');
+        if (tabLogin) tabLogin.classList.remove('active');
+        if (regFields) regFields.style.display = 'block';
+        if (btnText) btnText.innerText = 'Create Account';
+        if (modalLabel) modalLabel.innerText = 'Create Account';
+        if (modalSubtitle) modalSubtitle.innerText = 'Sign up for instant verification and bookings';
+        if (typeof currentAuthMode !== 'undefined') currentAuthMode = 'register';
+      }
+    }
+  </script>
+
+  <!-- Navigation & Mobile Drawer Styles -->
+  <style>
+    /* Navbar styling */
+    .valam-global-nav {
+      background: var(--valam-gradient);
+      box-shadow: 0 4px 20px rgba(9, 55, 140, 0.2);
+      z-index: 1030;
+    }
+    .hover-white:hover { color: #ffffff !important; }
+    .border-white-10 { border-color: rgba(255, 255, 255, 0.12) !important; }
+    .hover-white-10:hover { background-color: rgba(255, 255, 255, 0.1); }
+
+    /* Mobile Drawer (Strict Visual Styling & Layering) */
+    #mobileNavDrawer {
+      background: linear-gradient(180deg, #09378c 0%, #0f4bb4 100%) !important;
+      color: #ffffff !important;
+      z-index: 2000 !important;
+      width: 290px !important;
+      max-width: 82vw !important;
+      box-shadow: 4px 0 25px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Modal Layering - Placed above the Offcanvas */
+    #authModal, #bookingModal {
+      z-index: 2500 !important;
+    }
+
+    /* Modal Segmented Tab Control */
+    .auth-segmented-control {
+      background-color: var(--valam-light);
+      padding: 4px;
+      border-radius: var(--radius-pill);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+    }
+    .auth-segment-btn {
+      border: none;
+      background: transparent;
+      padding: 0.55rem 1rem;
+      border-radius: var(--radius-pill);
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .auth-segment-btn.active {
+      background-color: #ffffff;
+      color: var(--valam-blue);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    .tiny { font-size: 0.72rem; }
+
+    /* Bottom-sheet appearance on small viewports (< 576px) */
+    @media (max-width: 575.98px) {
+      .modal-dialog-centered {
+        align-items: flex-end;
+        min-height: calc(100% - 1rem);
+        margin: 0.5rem auto 0;
+      }
+      .modal-content {
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+      }
+    }
+  </style>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

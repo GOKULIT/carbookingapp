@@ -1,0 +1,432 @@
+{% extends 'base.html' %}
+{% block title %}{{ car.name }} | Reserve at Valam Cars{% endblock %}
+
+{% block content %}
+<!-- Leaflet CSS for Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<!-- Breadcrumb Header -->
+<section style="background: var(--valam-gradient); color: #ffffff; padding: 2rem 0;">
+  <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+      <span class="badge bg-white text-dark rounded-pill px-3 py-1 small fw-bold mb-2">
+        <i class="bi bi-shield-check text-success me-1"></i> Sanitzed & Inspected
+      </span>
+      <h2 class="fw-bold mb-0 text-white">{{ car.name }}</h2>
+    </div>
+    <div class="text-end">
+      <span class="h3 fw-bold text-white mb-0">₹{{ car.price_per_hour|int }}</span>
+      <span class="text-white-50 small">/ hour</span>
+      <div class="small text-white-50">₹{{ car.price_per_day|int }} / day</div>
+    </div>
+  </div>
+</section>
+
+<div class="container my-5">
+  <div class="row g-4 align-items-start">
+    
+    <!-- LEFT COLUMN: Car Showcase, Specs & Guidelines -->
+    <div class="col-lg-6">
+      
+      <!-- Car Visual Stage -->
+      <div class="valam-car-stage-detail bg-valam-light rounded-4 p-4 text-center position-relative overflow-hidden mb-4">
+        <div class="valam-ghost-text user-select-none" style="top:10%; left:5%; font-size:5rem;">
+          {{ car.watermark_text or car.name.split()[0].upper() }}
+        </div>
+        <img src="{{ car.image_url }}" alt="{{ car.name }}" class="img-fluid position-relative z-2" style="max-height: 280px; object-fit: contain;">
+      </div>
+
+      <!-- Overlap Collision Warning -->
+      <div id="booking-conflict-alert" class="alert alert-danger py-3 px-3 rounded-4 d-none mb-4 shadow-sm">
+        <h6 class="fw-bold text-danger mb-1"><i class="bi bi-exclamation-octagon-fill me-2"></i>Unavailable Reserved Slots</h6>
+        <p class="small text-danger-emphasis mb-2">This car is already locked for the following dates/times. Please pick another timeframe:</p>
+        <ul id="booking-conflict-list" class="small mb-0 ps-3"></ul>
+      </div>
+
+      <!-- Quick Specs -->
+      <div class="card border-0 rounded-4 bg-valam-light p-3 mb-4 shadow-sm">
+        <h6 class="fw-bold text-dark mb-3">Vehicle Specifications</h6>
+        <div class="row g-2 text-center">
+          <div class="col-4">
+            <div class="bg-white p-2 rounded-3">
+              <small class="text-muted d-block small">Transmission</small>
+              <b class="text-dark small"><i class="bi bi-gear-fill text-valam-blue me-1"></i>{{ car.transmission }}</b>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="bg-white p-2 rounded-3">
+              <small class="text-muted d-block small">Fuel Type</small>
+              <b class="text-dark small"><i class="bi bi-fuel-pump-fill text-valam-blue me-1"></i>{{ car.fuel_type }}</b>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="bg-white p-2 rounded-3">
+              <small class="text-muted d-block small">Seating</small>
+              <b class="text-dark small"><i class="bi bi-people-fill text-valam-blue me-1"></i>{{ car.seating_capacity }} Seats</b>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vehicle Overview & Perks -->
+      <div class="card border border-light-subtle rounded-4 p-4 bg-white shadow-sm mb-4">
+        <h6 class="fw-bold text-dark mb-2">About this Car</h6>
+        <p class="small text-muted mb-4">{{ car.description or "Premium self-drive vehicle maintained to official manufacturer standards. Thoroughly cleaned, inspected before every delivery, with 24/7 emergency roadside support included." }}</p>
+
+        <h6 class="fw-bold text-dark mb-2">What's Included</h6>
+        <ul class="list-unstyled small text-muted mb-0">
+          <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Comprehensive Zero-Depreciation Insurance</li>
+          <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Free 24/7 Roadside Assistance across Tamil Nadu</li>
+          <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Free Doorstep Return &amp; Pick-up options</li>
+          <li><i class="bi bi-check-circle-fill text-success me-2"></i> Fastag enabled for express toll clearing</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN: Interactive Route Map, Distance & Hour Predictor & Checkout -->
+    <div class="col-lg-6">
+      <div class="card border border-light-subtle rounded-4 p-4 bg-white shadow-sm sticky-top" style="top: 2rem;">
+        
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold text-dark mb-0">Route &amp; Reservation</h5>
+          <span class="badge rounded-pill bg-valam-blue px-3 py-1">Hourly Billing Engine</span>
+        </div>
+
+        <form id="car-booking-form">
+          <!-- Location Pickers -->
+          <div class="row g-2 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-muted mb-1">
+                <i class="bi bi-geo-alt-fill text-valam-blue me-1"></i>PICKUP HUB
+              </label>
+              <select id="pickup-select" class="form-select rounded-3 small">
+                <option value="11.0016,76.9628|RS Puram Hub">RS Puram Hub, Coimbatore</option>
+                <option value="11.0298,77.0434|Coimbatore Intl Airport">Coimbatore Intl Airport (CJB)</option>
+                <option value="10.9969,76.9676|Railway Station Hub">Coimbatore Junction Railway Stn</option>
+                <option value="11.0183,76.9678|Gandhipuram Central">Gandhipuram Central Bus Hub</option>
+                <option value="11.0827,76.9958|Saravanampatti IT Park">Saravanampatti (IT Corridor)</option>
+                <option value="10.9744,76.7404|Isha Yoga / Adiyogi">Adiyogi / Isha Yoga Center</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-muted mb-1">
+                <i class="bi bi-geo-alt-fill text-danger me-1"></i>DROP-OFF HUB
+              </label>
+              <select id="dropoff-select" class="form-select rounded-3 small">
+                <option value="11.0298,77.0434|Coimbatore Intl Airport">Coimbatore Intl Airport (CJB)</option>
+                <option value="11.0016,76.9628|RS Puram Hub">RS Puram Hub, Coimbatore</option>
+                <option value="10.9969,76.9676|Railway Station Hub">Coimbatore Junction Railway Stn</option>
+                <option value="11.0183,76.9678|Gandhipuram Central">Gandhipuram Central Bus Hub</option>
+                <option value="11.0827,76.9958|Saravanampatti IT Park">Saravanampatti (IT Corridor)</option>
+                <option value="10.9744,76.7404|Isha Yoga / Adiyogi">Adiyogi / Isha Yoga Center</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Interactive Leaflet Map -->
+          <div class="mb-3 position-relative">
+            <div id="route-map" class="rounded-4 border" style="height: 220px; width: 100%;"></div>
+            <div class="position-absolute bottom-0 start-0 m-2 bg-white px-2 py-1 rounded-pill small shadow-sm z-3" style="font-size:0.75rem;">
+              <i class="bi bi-info-circle-fill text-valam-blue me-1"></i> Interactive Route Map
+            </div>
+          </div>
+
+          <!-- Auto-Predicted Route Metrics Badge -->
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <div class="p-2 rounded-3 bg-valam-light border text-center">
+                <small class="text-muted d-block small">Predicted Distance</small>
+                <strong id="display-distance" class="text-dark fs-6">0 km</strong>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-2 rounded-3 bg-valam-light border text-center">
+                <small class="text-muted d-block small">Auto-Estimated Drive</small>
+                <strong id="display-eta" class="text-dark fs-6">0 Hours</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Booking Datetime Inputs -->
+          <div class="row g-2 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-muted mb-1">PICKUP DATE &amp; TIME</label>
+              <input type="datetime-local" id="pickup-dt" required class="form-control rounded-3 small">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-muted mb-1">DROP DATE &amp; TIME</label>
+              <input type="datetime-local" id="dropoff-dt" required class="form-control rounded-3 small">
+            </div>
+          </div>
+
+          <!-- Manual Hour Customizer (Stepper) -->
+          <div class="card border border-light-subtle rounded-3 p-3 bg-light mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <label class="fw-bold text-dark small mb-0 d-block">Rental Duration</label>
+                <small class="text-muted small">Adjust hours manually</small>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-outline-secondary rounded-circle btn-sm d-flex align-items-center justify-content-center" style="width:32px; height:32px;" onclick="stepHour(-1)">
+                  <i class="bi bi-dash"></i>
+                </button>
+                <input type="number" id="manual-hours-input" min="1" max="720" value="4" class="form-control text-center fw-bold bg-white" style="width: 70px;">
+                <button type="button" class="btn btn-outline-secondary rounded-circle btn-sm d-flex align-items-center justify-content-center" style="width:32px; height:32px;" onclick="stepHour(1)">
+                  <i class="bi bi-plus"></i>
+                </button>
+                <span class="small fw-semibold text-muted">Hours</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Fare Computation Breakdown -->
+          <div class="bg-valam-light rounded-4 p-3 mb-4 border">
+            <div class="d-flex justify-content-between small text-muted mb-1">
+              <span>Hourly Rate:</span>
+              <span class="text-dark">₹{{ car.price_per_hour|int }} / hr</span>
+            </div>
+            <div class="d-flex justify-content-between small text-muted mb-1">
+              <span>Total Billable Hours:</span>
+              <strong class="text-dark" id="calc-hours-label">4 Hours</strong>
+            </div>
+            <div class="d-flex justify-content-between small text-muted mb-2">
+              <span>GST &amp; Comprehensive Insurance:</span>
+              <span class="text-success fw-bold">Included</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+              <span class="fw-bold text-dark fs-6">Payable Total:</span>
+              <span class="h4 mb-0 fw-extrabold text-valam-blue" id="calc-total-fare">₹0</span>
+            </div>
+          </div>
+
+          <button type="submit" id="btn-submit-order" class="btn btn-valam-primary w-100 py-3 rounded-pill fw-bold shadow-sm">
+            <i class="bi bi-credit-card-2-front-fill me-2"></i> Proceed to Razorpay
+          </button>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const carId = {{ car.id }};
+  const pricePerHour = {{ car.price_per_hour }};
+  const rzpKey = "{{ rzp_key }}";
+
+  let map, pickupMarker, dropoffMarker, routePolyline;
+
+  // Initialize interactive Leaflet Map
+  function initRouteMap() {
+    map = L.map('route-map', { zoomControl: false }).setView([11.0168, 76.9558], 11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    updateMapLocations();
+  }
+
+  // Haversine formula to compute road distance & predict driving hours
+  function computeDistanceAndHours(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const straightDist = R * c;
+    
+    // Add realistic 25% road-routing factor
+    const roadKm = Math.max(3, Math.round(straightDist * 1.25));
+
+    // Assume average city speed of 28 km/h + 1 hr buffer for loading/returns
+    const predictedDriveHours = Math.max(2, Math.ceil(roadKm / 28) + 1);
+
+    return { km: roadKm, predictedHours: predictedDriveHours };
+  }
+
+  function updateMapLocations() {
+    const pickupVal = document.getElementById('pickup-select').value.split('|')[0].split(',');
+    const dropVal = document.getElementById('dropoff-select').value.split('|')[0].split(',');
+
+    const pLat = parseFloat(pickupVal[0]), pLon = parseFloat(pickupVal[1]);
+    const dLat = parseFloat(dropVal[0]), dLon = parseFloat(dropVal[1]);
+
+    if (pickupMarker) map.removeLayer(pickupMarker);
+    if (dropoffMarker) map.removeLayer(dropoffMarker);
+    if (routePolyline) map.removeLayer(routePolyline);
+
+    pickupMarker = L.marker([pLat, pLon]).addTo(map).bindPopup("<b>Pickup Hub</b>");
+    dropoffMarker = L.marker([dLat, dLon]).addTo(map).bindPopup("<b>Drop-off Hub</b>");
+
+    routePolyline = L.polyline([[pLat, pLon], [dLat, dLon]], {
+      color: '#0f4bb4',
+      weight: 4,
+      dashArray: '8, 8'
+    }).addTo(map);
+
+    const bounds = L.latLngBounds([[pLat, pLon], [dLat, dLon]]);
+    map.fitBounds(bounds, { padding: [30, 30] });
+
+    // Auto-predict distance and hours
+    const prediction = computeDistanceAndHours(pLat, pLon, dLat, dLon);
+    document.getElementById('display-distance').innerText = `${prediction.km} km`;
+    document.getElementById('display-eta').innerText = `${prediction.predictedHours} Hours`;
+
+    // Update manual hours input to match prediction
+    document.getElementById('manual-hours-input').value = prediction.predictedHours;
+    syncDropoffFromManualHours();
+  }
+
+  function stepHour(delta) {
+    const inp = document.getElementById('manual-hours-input');
+    let val = parseInt(inp.value) || 1;
+    val = Math.max(1, Math.min(720, val + delta));
+    inp.value = val;
+    syncDropoffFromManualHours();
+  }
+
+  function syncDropoffFromManualHours() {
+    const hours = parseInt(document.getElementById('manual-hours-input').value) || 1;
+    const startVal = document.getElementById('pickup-dt').value;
+    if (!startVal) return;
+
+    const start = new Date(startVal);
+    const end = new Date(start.getTime() + hours * 3600 * 1000);
+
+    const pad = (n) => String(n).padStart(2, '0');
+    const endStr = `${end.getFullYear()}-${pad(end.getMonth() + 1)}-${pad(end.getDate())}T${pad(end.getHours())}:${pad(end.getMinutes())}`;
+    document.getElementById('dropoff-dt').value = endStr;
+
+    recomputeFare(hours);
+  }
+
+  function syncHoursFromDates() {
+    const s = new Date(document.getElementById('pickup-dt').value);
+    const e = new Date(document.getElementById('dropoff-dt').value);
+    if (e > s) {
+      const diffHours = Math.max(1, Math.ceil((e - s) / (1000 * 60 * 60)));
+      document.getElementById('manual-hours-input').value = diffHours;
+      recomputeFare(diffHours);
+    }
+  }
+
+  function recomputeFare(hours) {
+    const total = hours * pricePerHour;
+    document.getElementById('calc-hours-label').innerText = `${hours} Hours`;
+    document.getElementById('calc-total-fare').innerText = `₹${total.toLocaleString()}`;
+  }
+
+  // Load any conflicting booked slots
+  async function loadBookedSlots() {
+    try {
+      const slots = await API.request(`/bookings/car/${carId}/booked-slots`);
+      const alertBox = document.getElementById('booking-conflict-alert');
+      const listEl = document.getElementById('booking-conflict-list');
+
+      if (slots && slots.length > 0) {
+        listEl.innerHTML = slots.map(s => `<li>${s.start_formatted} &rarr; ${s.end_formatted}</li>`).join('');
+        alertBox.classList.remove('d-none');
+      } else {
+        alertBox.classList.add('d-none');
+      }
+    } catch (err) {
+      console.warn("Could not retrieve booked slots:", err);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initRouteMap();
+    loadBookedSlots();
+
+    // Default pickup: 1 hour from now
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    const start = new Date(now.getTime() + 1 * 3600 * 1000);
+    document.getElementById('pickup-dt').value = start.toISOString().slice(0, 16);
+
+    syncDropoffFromManualHours();
+
+    document.getElementById('pickup-select').addEventListener('change', updateMapLocations);
+    document.getElementById('dropoff-select').addEventListener('change', updateMapLocations);
+    document.getElementById('pickup-dt').addEventListener('change', syncDropoffFromManualHours);
+    document.getElementById('dropoff-dt').addEventListener('change', syncHoursFromDates);
+    document.getElementById('manual-hours-input').addEventListener('input', () => {
+      syncDropoffFromManualHours();
+    });
+
+    // Booking Checkout trigger
+    document.getElementById('car-booking-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const user = API.getUser();
+
+      if (!user) {
+        openAuthModal('login', () => document.getElementById('car-booking-form').requestSubmit());
+        return;
+      }
+
+      const pickupHubName = document.getElementById('pickup-select').value.split('|')[1];
+      const dropoffHubName = document.getElementById('dropoff-select').value.split('|')[1];
+
+      const payload = {
+        car_id: carId,
+        pickup_location: pickupHubName,
+        dropoff_location: dropoffHubName,
+        pickup_datetime: document.getElementById('pickup-dt').value,
+        dropoff_datetime: document.getElementById('dropoff-dt').value
+      };
+
+      try {
+        const order = await API.request('/bookings/create-order', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+
+        const rzp = new Razorpay({
+          key: rzpKey,
+          amount: order.amount,
+          currency: "INR",
+          name: "Valam Self Driving Cars",
+          description: `Hourly Reservation #${order.booking_id}`,
+          order_id: order.order_id,
+          prefill: {
+            name: user.full_name,
+            email: user.email,
+            contact: user.phone
+          },
+          theme: { color: "#0f4bb4" },
+          handler: async function (response) {
+            try {
+              await API.request('/bookings/verify-payment', {
+                method: 'POST',
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature
+                })
+              });
+              alert("Payment verified! Your reservation is confirmed.");
+              window.location.href = '/my-bookings';
+            } catch (verErr) {
+              alert(`Payment verification error: ${verErr.message}`);
+            }
+          }
+        });
+
+        rzp.open();
+      } catch (err) {
+        alert(err.message); // Displays collision error if selected timeframe is booked
+      }
+    });
+  });
+</script>
+{% endblock %}
